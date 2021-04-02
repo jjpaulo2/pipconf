@@ -4,6 +4,7 @@ from typing import NoReturn
 
 from pipconf import __version__
 from pipconf import kernel 
+from pipconf import environment
 
 
 NAME = "pipconf"
@@ -43,6 +44,8 @@ def init_argparse() -> argparse.ArgumentParser:
 
 
 def main() -> NoReturn:
+    environment.initialize_environment()
+    
     parser = init_argparse()
     args = parser.parse_args()
 
