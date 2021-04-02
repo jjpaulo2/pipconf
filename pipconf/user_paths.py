@@ -10,3 +10,4 @@ class UserPath(Enum):
 
     HOME_DIRECTORY = str(Path.home())
     PIP_CONFIG_DIRECTORY = HOME_DIRECTORY + "/.pip"
+    PIP_CONFIG_DEFAULT_FILE = PIP_CONFIG_DIRECTORY + "/pip.conf"

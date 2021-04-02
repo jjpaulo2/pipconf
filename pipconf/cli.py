@@ -1,36 +1,62 @@
 import argparse
 
 from typing import NoReturn
+
 from pipconf import __version__
+from pipconf import kernel 
 
 
 NAME = "pipconf"
 VERSION = __version__
 DESCRIPTION = """
-______ ___________  _____ _____ _   _ ______ 
-| ___ \_   _| ___ \/  __ \  _  | \ | ||  ___|
-| |_/ / | | | |_/ /| /  \/ | | |  \| || |_   
-|  __/  | | |  __/ | |   | | | | . ` ||  _|  
-| |    _| |_| |    | \__/\ \_/ / |\  || |    
-\_|    \___/\_|     \____/\___/\_| \_/\_|  v{}
+\033[93m______ ___________  _____ _____ _   _ ______ \033[0m
+\033[93m| ___ \_   _| ___ \/  __ \  _  | \ | ||  ___|\033[0m
+\033[93m| |_/ / | | | |_/ /| /  \/ | | |  \| || |_ \033[0m
+\033[93m|  __/  | | |  __/ | |   | | | | . ` ||  _|\033[0m
+\033[93m| |    _| |_| |    | \__/\ \_/ / |\  || |\033[0m
+\033[93m\_|    \___/\_|     \____/\___/\_| \_/\_|\033[0m  v{}
 
 Under BSD-2-Clause License, by @jjpaulo2
 Contribute at https://github.com/jjpaulo2/pipconf
 """.format(VERSION)
 
 
-def main() -> NoReturn:
+def init_argparse() -> argparse.ArgumentParser:
+    """
+    Function that initializes the `ArgumentParser` and returns it.
+    """
     parser = argparse.ArgumentParser(
         prog=NAME,
         description=DESCRIPTION,
         formatter_class=argparse.RawTextHelpFormatter
     )
-    actions = parser.add_argument_group("avaliable actions")
 
-    actions.add_argument("--list", action="store_true", help="list all user configurations avaliable at $HOME/.pip")
-    actions.add_argument("--set", type=str, help="set the global configuration for pip")
+    display = parser.add_argument_group("display informations")
+    display.add_argument("--current", action="store_true", help="show the current pip configuration file")
+    display.add_argument("--list", action="store_true", help="list all user configurations avaliable at $HOME/.pip")
+    
+    change = parser.add_argument_group("change configuration")
+    change.add_argument("--set", type=str, dest="filename", help="set the global configuration for pip from a file in $HOME/.pip")
+    change.add_argument("--local", action="store_true", help="set the pip configuration for the current directory file")
 
+    return parser
+
+
+def main() -> NoReturn:
+    parser = init_argparse()
     args = parser.parse_args()
+
+    if args.list:
+        kernel.print_user_configurations()
+
+    if args.filename:
+        kernel.set_user_configuration(args.filename)
+
+    if args.local:
+        kernel.set_local_configuration()
+
+    if args.current:
+        kernel.print_current_configuration()
 
 
 if __name__ == "__main__":
