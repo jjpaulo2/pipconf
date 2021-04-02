@@ -1,4 +1,6 @@
-# PIPCONF
+# PIPCONF - The PIP configuration manager
+
+![](screenshot.png)
 
 If you need to manage multiple configurations containing indexes and trusted hosts for PIP, this project was made for you.
 
