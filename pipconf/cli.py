@@ -3,12 +3,20 @@ import argparse
 from typing import NoReturn
 
 from pipconf import __version__
+from pipconf import __module__
+from pipconf import __license__
+from pipconf import __author_github__
+from pipconf import __index__
+
 from pipconf import kernel 
 from pipconf import environment
 
 
-NAME = "pipconf"
+NAME = __module__
 VERSION = __version__
+LICENSE = __license__
+AUTHOR = __author_github__
+INDEX = __index__
 DESCRIPTION = """
 \033[93m______ ___________  _____ _____ _   _ ______ \033[0m
 \033[93m| ___ \_   _| ___ \/  __ \  _  | \ | ||  ___|\033[0m
@@ -17,9 +25,9 @@ DESCRIPTION = """
 \033[93m| |    _| |_| |    | \__/\ \_/ / |\  || |\033[0m
 \033[93m\_|    \___/\_|     \____/\___/\_| \_/\_|\033[0m  v{}
 
-Under BSD-2-Clause License, by @jjpaulo2
-Contribute at https://github.com/jjpaulo2/pipconf
-""".format(VERSION)
+Under {} License, by {}
+Contribute at {}
+""".format(VERSION, LICENSE, AUTHOR, INDEX)
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -31,6 +39,8 @@ def init_argparse() -> argparse.ArgumentParser:
         description=DESCRIPTION,
         formatter_class=argparse.RawTextHelpFormatter
     )
+
+    parser.add_argument("-v", "--version", action="store_true", help="show the version of the module")
 
     display = parser.add_argument_group("display informations")
     display.add_argument("--current", action="store_true", help="show the current pip configuration file")
@@ -47,6 +57,11 @@ def handle_arguments(args) -> NoReturn:
     """
     Function that verify all cli arguments and handle it.
     """
+
+    # Module version
+    if args.version:
+        # --version
+        print(f"{NAME} {VERSION}")
 
     # Display arguments
     if args.current:
