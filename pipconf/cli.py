@@ -43,23 +43,38 @@ def init_argparse() -> argparse.ArgumentParser:
     return parser
 
 
+def handle_arguments(args) -> NoReturn:
+    """
+    Function that verify all cli arguments and handle it.
+    """
+
+    # Display arguments
+    if args.current:
+        # --current
+        kernel.print_current_configuration()
+
+    if args.list:
+        # --list
+        kernel.print_user_configurations()
+
+    # Change arguments
+    if args.filename:
+        # --set [filename]
+        kernel.set_user_configuration(args.filename)
+
+    if args.local:
+        # --local
+        kernel.set_local_configuration()
+
+
+
 def main() -> NoReturn:
     environment.initialize_environment()
     
     parser = init_argparse()
     args = parser.parse_args()
 
-    if args.list:
-        kernel.print_user_configurations()
-
-    if args.filename:
-        kernel.set_user_configuration(args.filename)
-
-    if args.local:
-        kernel.set_local_configuration()
-
-    if args.current:
-        kernel.print_current_configuration()
+    handle_arguments(args)
 
 
 if __name__ == "__main__":
