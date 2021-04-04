@@ -46,7 +46,7 @@ def print_user_configurations() -> NoReturn:
             current_start = "\033[93m*"
             current_end = "\033[0m"
 
-        print(f"{current_start} {filename} ({filepath}) {current_end}")
+        print(f"{current_start} {filename} ({filepath}) {current_end}\n")
 
 
 def print_current_configuration() -> NoReturn:
@@ -58,10 +58,10 @@ def print_current_configuration() -> NoReturn:
 
     print()
     if filepath:
-        print(f"  The current pip configuration file is \033[93m{filepath}\033[0m")
+        print(f"  The current pip configuration file is \033[93m{filepath}\033[0m\n")
 
     else:
-        print("  No configuration file defined.")
+        print("  No configuration file defined.\n")
 
 
 def set_user_configuration(filename: str) -> NoReturn:
@@ -76,6 +76,7 @@ def set_user_configuration(filename: str) -> NoReturn:
     print()
     print("  Current pip configuration successfully updated.")
     print(f"  The active config file is \033[93m{new_config_filepath}\033[0m")
+    print()
 
 
 def set_local_configuration() -> NoReturn:
@@ -94,8 +95,8 @@ def set_local_configuration() -> NoReturn:
         new_config_filepath = current_directory + "/" + expected_local_config_filename
 
         switch.set_current_configuration(new_config_filepath)
-        print(f"  The active config file is \033[93m{new_config_filepath}\033[0m")
+        print(f"  The active config file is \033[93m{new_config_filepath}\033[0m\n")
 
     else:
-        print("  Not found \033[91mpip.conf\033[0m file in this folder.")
+        print("  Not found \033[91mpip.conf\033[0m file in this folder.\n")
     
