@@ -1,5 +1,5 @@
 # Module informations
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __module__ = "pipconf"
 __description__ = "Python's PIP configuration manager"
 __index__ = "https://github.com/jjpaulo2/pipconf"

@@ -46,7 +46,9 @@ def print_user_configurations() -> NoReturn:
             current_start = "\033[93m*"
             current_end = "\033[0m"
 
-        print(f"{current_start} {filename} ({filepath}) {current_end}\n")
+        print(f"{current_start} {filename} ({filepath}) {current_end}")
+    
+    print()
 
 
 def print_current_configuration() -> NoReturn:
