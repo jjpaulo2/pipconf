@@ -39,13 +39,17 @@ trusted-host = mycompany.com
 
 ## Instalation
 
-This project uses only pure Python. So, you don't need to install any project dependencies. Just run the `setuptools` installer.
+The package is available at [pypi.org](https://pypi.org/project/pipconf/). Then, you can install it using pip.
+
+```shell
+$ pip install pipconf
+```
+
+If you prefet to install from code, try this. This project uses only pure Python. So, you don't need to install any project dependencies. Just run the `setuptools` installer.
 
 ```shell
 $ python setup.py install
 ```
-
-Coming soon, the package will be avaliable at PyPI.
 
 ## Usage
 

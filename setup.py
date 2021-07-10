@@ -32,9 +32,7 @@ setuptools.setup(
     },
 
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: BSD 2-Clause License",
-        "Operating System :: Linux :: Mac OS",
+        "Programming Language :: Python :: 3"
     ],
 
     packages=setuptools.find_packages(),
