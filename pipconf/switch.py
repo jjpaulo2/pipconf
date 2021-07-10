@@ -24,7 +24,6 @@ def get_current_configuration() -> Tuple[str, str]:
     absolute_path = None
 
     with suppress(FileNotFoundError):
-        relative_path = os.readlink(pip_config_default_file)
         absolute_path = os.path.realpath(pip_config_default_file)
         filename = os.path.basename(pip_config_default_file)
 
