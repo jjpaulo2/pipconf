@@ -2,8 +2,8 @@ from unittest.mock import patch
 from pytest import mark
 from pipconf import switch
 
-from tests.fixtures.switch import UserPathMock
-from tests.fixtures.switch import USER_PIP_CONFIG_FILE
+from tests.fixtures.user_path import UserPathMock
+from tests.fixtures.user_path import USER_PIP_CONFIG_FILE
 from tests.fixtures.switch import GET_CURRENT_CONFIGURATION
 
 
