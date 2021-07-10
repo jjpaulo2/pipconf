@@ -1,4 +1,15 @@
+# Text editor
 .vscode
+
+# Venv
 venv
+
+# Tests
 __pycache__
 .coverage
+.pytest_cache
+
+# Build
+dist
+build
+pipconf.egg-info
