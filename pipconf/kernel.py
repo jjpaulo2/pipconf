@@ -32,7 +32,7 @@ def print_user_configurations() -> NoReturn:
     config_filenames, config_files = get_user_configurations()
     quant_files = len(config_files)
 
-    current_config_filename, current_config_filepath = switch.get_current_configuration()
+    _, current_config_filepath = switch.get_current_configuration()
 
     print()
     for i in range(quant_files):
@@ -56,7 +56,7 @@ def print_current_configuration() -> NoReturn:
     Function that shows the current configuration file used
     by the active user.
     """
-    filename, filepath = switch.get_current_configuration()
+    _, filepath = switch.get_current_configuration()
 
     print()
     if filepath:
