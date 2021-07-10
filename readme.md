@@ -39,7 +39,13 @@ trusted-host = mycompany.com
 
 ## Instalation
 
-Coming soon...
+This project uses only pure Python. So, you don't need to install any project dependencies. Just run the `setuptools` installer.
+
+```shell
+$ python setup.py install
+```
+
+Coming soon, the package will be avaliable at PyPI.
 
 ## Usage
 
