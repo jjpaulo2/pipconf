@@ -45,7 +45,7 @@ The package is available at [pypi.org](https://pypi.org/project/pipconf/). Then,
 $ pip install pipconf
 ```
 
-If you prefet to install from code, try this. This project uses only pure Python. So, you don't need to install any project dependencies. Just run the `setuptools` installer.
+If you prefer to install from code, try this. This project uses only pure Python. So, you don't need to install any project dependencies. Just run the `setuptools` installer.
 
 ```shell
 $ python setup.py install
