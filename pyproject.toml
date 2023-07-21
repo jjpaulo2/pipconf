@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "pipconf"
+version = "1.0.0"
+description = "Python's PIP configuration manager"
+authors = [ "João Paulo Carvalho <email@jjpaulo2.dev.br>" ]
+repository = "https://github.com/jjpaulo2/pipconf"
+license = "BSD 2-Clause License"
+readme = "readme.md"
+packages = [{ include = "pipconf" }]
+keywords = [ 
+    "configurations",
+    "configs",
+    "settings",
+    "pip",
+    "pip.conf"
+]
+classifiers = [
+    "Environment :: Console",
+    "Topic :: Utilities",
+    "Typing :: Typed"
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/jjpaulo2/pipconf/issues"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.4.0"
+pytest-randomly = "^3.13.0"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.4.1"
+bandit = "^1.7.5"
+pylint = "^2.17.4"
+pylama = "^8.4.1"
+
+[tool.poetry.scripts]
+pipconf = "pipconf.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
