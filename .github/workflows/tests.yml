@@ -2,16 +2,11 @@ name: Unit Tests
 
 on:
 
+  workflow_dispatch:
   pull_request:
     branches: [ "main" ]
     types: [ "opened", "edited", "synchronize" ]
 
-  workflow_dispatch:
-    inputs:
-      start_deploy:
-        type: boolean
-        description: Are you sure to start this action?
-        default: false
 
 permissions:
   contents: read
