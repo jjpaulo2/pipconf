@@ -60,17 +60,17 @@ class PipConfigurations:
         config_path = self._conf_file(name)
         if config_path.exists():
             raise EnvironmentError(
-                f'The configuration {name} already exists on {str(self.directory)}.'
+                f'The file {name}.conf already exists on {str(self.directory)}!'
             )
         config_path.touch()
         return config_path
     
-    def show(self, name: str) -> list[str]:
+    def show(self, name: str) -> str:
         config_path = self._conf_file(name)
         if not config_path.exists():
             raise EnvironmentError(
-                f'The configuration {name} does not exist on {str(self.directory)}.'
+                f'The file {name}.conf does not exist on {str(self.directory)}!'
             )
         with open(config_path, 'r') as file:
-            return file.readlines()
+            return file.read()
         
