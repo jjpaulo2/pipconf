@@ -1,4 +1,4 @@
-from pipconf.cli import main
+# from pipconf.cli import main
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

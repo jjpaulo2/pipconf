@@ -3,7 +3,7 @@ __version__ = "1.0.0"
 __module__ = "pipconf"
 __description__ = "Python's PIP configuration manager"
 __index__ = "https://github.com/jjpaulo2/pipconf"
-__license__ = "BSD 2-Clause"
+__license__ = "BSD-2-Clause"
 
 # Author informations
 __author__ = "João Paulo Carvalho"
