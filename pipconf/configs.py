@@ -3,18 +3,13 @@ from shutil import copyfile
 from typing import List, Optional
 
 
-class PipConfigurations:
+class PipConfigs:
 
     def __init__(self) -> None:
         self._directory: Optional[Path] = None
         self._default_file: Optional[Path] = None
         self._extension = 'conf'
-
-    def _conf_name(self, path: Path) -> str:
-        return path.name.removesuffix(f'.{self._extension}')
-
-    def _conf_file(self, name: str) -> Path:
-        return self.directory.joinpath(f'{name}.{self._extension}')
+        self._config_file = 'pip.conf'
 
     @property
     def directory(self) -> Path:
@@ -27,50 +22,58 @@ class PipConfigurations:
     @property
     def default_file(self) -> Path:
         if self._default_file is None:
-            self._default_file = self.directory.joinpath(f'pip.{self._extension}')
+            self._default_file = self.directory.joinpath(self._config_file)
         return self._default_file
     
     @property
-    def current(self) -> Optional[str]:
-        if self.default_file.exists():
-            return self._conf_name(self.default_file.readlink())
-        return None
+    def current(self) -> Path:
+        if not self.default_file.exists():
+            raise EnvironmentError('No configuration found!')
+        return self.default_file.readlink()
     
     @property
-    def available_configs(self) -> List[str]:
-        return [
-            self._conf_name(path)
+    def local(self) -> Path:
+        cwd = Path.cwd()
+        file_path = cwd.joinpath(self._config_file)
+        if not file_path.exists():
+            raise EnvironmentError(f'No configuration found at {str(cwd)}!')
+        return file_path
+    
+    @property
+    def available_configs(self) -> List[Path]:
+        gotten_files = [
+            path
             for path in self.directory.iterdir()
             if all([
                 not path.is_symlink(),
                 path != self.default_file
             ])
         ]
+        if not gotten_files:
+            raise EnvironmentError('No one configuration found!')
+        return gotten_files
+    
+    def get_path(self, name: str) -> Path:
+        if not name.endswith(self._extension):
+            name = f'{name}.{self._extension}'
+        return self.directory.joinpath(name)
 
-    def select(self, name: str):
-        if self.default_file.exists():
-            if self.default_file.is_symlink():
-                self.default_file.unlink()
-            else:
-                backup_path = self.default_file.parent.joinpath(f'pip.backup.{self._extension}')
-                copyfile(str(self.default_file), str(backup_path))
-        self.default_file.symlink_to(str(self._conf_file(name)))
+    def select(self, path: Path):
+        if not path.exists():
+            raise EnvironmentError(f'The file {path} does not exist!')
+        if not self.default_file.is_symlink():
+            backup_path = self.default_file.parent.joinpath(f'pip.backup.{self._extension}')
+            copyfile(str(self.default_file), str(backup_path))
+        self.default_file.unlink()
+        self.default_file.symlink_to(path)
     
-    def create(self, name: str) -> Path:
-        config_path = self._conf_file(name)
-        if config_path.exists():
-            raise EnvironmentError(
-                f'The file {name}.conf already exists on {str(self.directory)}!'
-            )
-        config_path.touch()
-        return config_path
+    def create(self, path: Path):
+        if path.exists():
+            raise EnvironmentError(f'The file {path} already exists!')
+        path.touch()
     
-    def show(self, name: str) -> str:
-        config_path = self._conf_file(name)
-        if not config_path.exists():
-            raise EnvironmentError(
-                f'The file {name}.conf does not exist on {str(self.directory)}!'
-            )
-        with open(config_path, 'r') as file:
+    def show(self, path: Path) -> str:
+        if not path.exists():
+            raise EnvironmentError(f'The file {path} does not exist!')
+        with open(path, 'r') as file:
             return file.read()
-        
