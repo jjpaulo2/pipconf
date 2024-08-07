@@ -1,82 +1,49 @@
-name: Publish to PyPI
+name: Publish
 
 on:
-
-  pull_request:
-    branches: [ "main" ]
-    types: [ "closed" ]
-
-  workflow_dispatch:
-    inputs:
-      start_deploy:
-        type: boolean
-        description: Are you sure to start this action?
-        default: false
-
-permissions:
-  contents: read
+  push:
+    tags:
+      - '*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  python:
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pipconf/
 
-  tests:
-
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged || github.event.inputs.start_deploy
-
-    strategy:
-      matrix:
-        python: [3.8, 3.9, "3.10", 3.11]
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-
-    - name: Set up Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.5.1
-
-    - name: Install dependencies
-      run: |
-        poetry install --with=tests
-
-    - name: Run pytest
-      run: |
-        poetry run pytest -v
-
-  publish:
+    permissions:
+      id-token: write
 
     runs-on: ubuntu-latest
-    needs: tests
-
-    env:
-      POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+    timeout-minutes: 20
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
 
-    - name: Set up Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.5.1
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
 
-    - name: Build project
-      run: |
-        poetry build --format wheel
+      - name: Install dependencies
+        run: poetry install --with dev
 
-    - name: Publish to PyPI
-      run: |
-        poetry publish
+      - name: Build package
+        run: poetry build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipconf-${{  github.ref_name }}
+          path: dist/*
+      
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

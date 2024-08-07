@@ -50,4 +50,3 @@ def test_current(readlink: MagicMock):
     configs = PipConfigs()
     assert configs.current == Path(SYMLINK_PATH)
     assert readlink.call_count == 1
-

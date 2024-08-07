@@ -9,10 +9,7 @@ from pipconf.consts import PADDING, ExitCodes, Chars, HelpPanels
 from pipconf import __help__
 
 
-app = Typer(
-    rich_markup_mode='rich',
-    help=__help__
-)
+app = Typer(rich_markup_mode='rich', help=__help__)
 console = Console()
 configs = PipConfigs()
 
@@ -25,29 +22,46 @@ def list():
         for path in configs.available_configs:
             if path != configs.current:
                 lines.append(
-                    f"{Chars.EMPTY_CIRCLE.decode()} {path.name} ([grey42]{str(path)}[/])"
+                    f'{Chars.EMPTY_CIRCLE.decode()} {path.name} ([grey42]{str(path)}[/])'
                 )
             else:
                 lines.append(
-                    f"[green]{Chars.FILLED_CIRCLE.decode()} {path.name}[/] ([grey42]{str(path)}[/])"
+                    f'[green]{Chars.FILLED_CIRCLE.decode()} {path.name}[/] ([grey42]{str(path)}[/])'
                 )
 
-        console.print(Padding(f'Available configurations at [yellow]{configs.directory}[/]:', PADDING))
-        console.print(Padding('\n'.join(lines), (0,0,1,1,)))
+        console.print(
+            Padding(
+                f'Available configurations at [yellow]{configs.directory}[/]:',
+                PADDING,
+            )
+        )
+        console.print(
+            Padding(
+                '\n'.join(lines),
+                (
+                    0,
+                    0,
+                    1,
+                    1,
+                ),
+            )
+        )
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING), style='red')
         raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
-        
+
 
 @app.command(rich_help_panel=HelpPanels.DISPLAY)
 def current():
     """Shows the currently active config file"""
     try:
-        console.print(Padding(
-            f'Current configuration is [yellow]{str(configs.current)}[/]!',
-            PADDING
-        ))
+        console.print(
+            Padding(
+                f'Current configuration is [yellow]{str(configs.current)}[/]!',
+                PADDING,
+            )
+        )
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING), style='red')
@@ -63,10 +77,7 @@ def show(name: Optional[str] = None, local: bool = False):
         else:
             path = configs.get_path(name) if name else configs.current
 
-        console.print(Panel(
-            Syntax(configs.show(path), 'ini'),
-            title=str(path)
-        ))
+        console.print(Panel(Syntax(configs.show(path), 'ini'), title=str(path)))
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING))
@@ -79,10 +90,9 @@ def new(name: str, open: bool = False):
     try:
         path = configs.get_path(name)
         configs.create(path)
-        console.print(Padding(
-            f'Config file [green]{path.name}[/] created!',
-            PADDING
-        ))
+        console.print(
+            Padding(f'Config file [green]{path.name}[/] created!', PADDING)
+        )
 
         if open:
             exit_code = launch(str(path))
@@ -100,10 +110,11 @@ def set(name: str):
     try:
         path = configs.get_path(name)
         configs.select(path)
-        console.print(Padding(
-            f'Configuration is now set to [yellow]{path.name}[/]!',
-            PADDING
-        ))
+        console.print(
+            Padding(
+                f'Configuration is now set to [yellow]{path.name}[/]!', PADDING
+            )
+        )
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING))
@@ -116,10 +127,12 @@ def local():
     try:
         local_config = configs.local
         configs.select(local_config)
-        console.print(Padding(
-            f'Configuration is now set to [yellow]{str(local_config)}[/]!',
-            PADDING
-        ))
+        console.print(
+            Padding(
+                f'Configuration is now set to [yellow]{str(local_config)}[/]!',
+                PADDING,
+            )
+        )
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING))

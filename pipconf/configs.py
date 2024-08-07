@@ -4,7 +4,6 @@ from typing import List, Optional
 
 
 class PipConfigs:
-
     def __init__(self) -> None:
         self._directory: Optional[Path] = None
         self._default_file: Optional[Path] = None
@@ -18,19 +17,19 @@ class PipConfigs:
             if not self._directory.exists():
                 self._directory.mkdir(exist_ok=True)
         return self._directory
-    
+
     @property
     def default_file(self) -> Path:
         if self._default_file is None:
             self._default_file = self.directory.joinpath(self._config_file)
         return self._default_file
-    
+
     @property
     def current(self) -> Path:
         if not self.default_file.exists():
             raise EnvironmentError('No configuration found!')
         return self.default_file.readlink()
-    
+
     @property
     def local(self) -> Path:
         cwd = Path.cwd()
@@ -38,21 +37,18 @@ class PipConfigs:
         if not file_path.exists():
             raise EnvironmentError(f'No configuration found at {str(cwd)}!')
         return file_path
-    
+
     @property
     def available_configs(self) -> List[Path]:
         gotten_files = [
             path
             for path in self.directory.iterdir()
-            if all([
-                not path.is_symlink(),
-                path != self.default_file
-            ])
+            if all([not path.is_symlink(), path != self.default_file])
         ]
         if not gotten_files:
             raise EnvironmentError('No one configuration found!')
         return gotten_files
-    
+
     def get_path(self, name: str) -> Path:
         if not name.endswith(self._extension):
             name = f'{name}.{self._extension}'
@@ -62,16 +58,18 @@ class PipConfigs:
         if not path.exists():
             raise EnvironmentError(f'The file {path} does not exist!')
         if not self.default_file.is_symlink():
-            backup_path = self.default_file.parent.joinpath(f'pip.backup.{self._extension}')
+            backup_path = self.default_file.parent.joinpath(
+                f'pip.backup.{self._extension}'
+            )
             copyfile(str(self.default_file), str(backup_path))
         self.default_file.unlink()
         self.default_file.symlink_to(path)
-    
+
     def create(self, path: Path):
         if path.exists():
             raise EnvironmentError(f'The file {path} already exists!')
         path.touch()
-    
+
     def show(self, path: Path) -> str:
         if not path.exists():
             raise EnvironmentError(f'The file {path} does not exist!')
