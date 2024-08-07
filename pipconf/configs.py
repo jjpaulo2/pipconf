@@ -9,6 +9,9 @@ class PipConfigs:
         self._default_file: Optional[Path] = None
         self._extension = 'conf'
         self._config_file = 'pip.conf'
+        self._template = Path(__file__).parent.parent.joinpath(
+            f'templates/{self._config_file}'
+        )
 
     @property
     def directory(self) -> Path:
@@ -61,14 +64,14 @@ class PipConfigs:
             backup_path = self.default_file.parent.joinpath(
                 f'pip.backup.{self._extension}'
             )
-            copyfile(str(self.default_file), str(backup_path))
+            copyfile(self.default_file, backup_path)
         self.default_file.unlink()
         self.default_file.symlink_to(path)
 
     def create(self, path: Path):
         if path.exists():
             raise EnvironmentError(f'The file {path} already exists!')
-        path.touch()
+        copyfile(self._template, path)
 
     def show(self, path: Path) -> str:
         if not path.exists():

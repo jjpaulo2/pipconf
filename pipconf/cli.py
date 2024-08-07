@@ -1,5 +1,5 @@
-from typing import Optional
-from typer import Typer, Exit, launch
+from typing import Annotated, Optional
+from typer import Argument, Typer, Exit, launch
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.panel import Panel
@@ -69,7 +69,7 @@ def current():
 
 
 @app.command(rich_help_panel=HelpPanels.DISPLAY)
-def show(name: Optional[str] = None, local: bool = False):
+def show(name: Annotated[Optional[str], Argument()] = None, local: bool = False):
     """Shows a config file content"""
     try:
         if local:
