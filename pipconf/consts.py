@@ -7,3 +7,8 @@ class Chars:
 class ExitCodes:
     NO_SUCH_FILE_OR_DIRECTORY = 2
     FILE_EXISTS = 17
+
+
+class HelpPanels:
+    DISPLAY = 'Display informations'
+    CHANGE = 'Change configurations'

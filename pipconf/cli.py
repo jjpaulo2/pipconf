@@ -1,18 +1,23 @@
+from typing import Optional
 from typer import Typer, Exit, launch
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.panel import Panel
 from rich.padding import Padding
 from pipconf.configs import PipConfigs
-from pipconf.consts import PADDING, ExitCodes, Chars
+from pipconf.consts import PADDING, ExitCodes, Chars, HelpPanels
+from pipconf import __help__
 
 
-app = Typer()
+app = Typer(
+    rich_markup_mode='rich',
+    help=__help__
+)
 console = Console()
 configs = PipConfigs()
 
 
-@app.command()
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
 def list():
     """Lists all available configs"""
     try:
@@ -35,7 +40,7 @@ def list():
         raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
         
 
-@app.command()
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
 def current():
     """Shows the currently active config file"""
     try:
@@ -49,7 +54,26 @@ def current():
         raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
 
 
-@app.command()
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
+def show(name: Optional[str] = None, local: bool = False):
+    """Shows a config file content"""
+    try:
+        if local:
+            path = configs.local
+        else:
+            path = configs.get_path(name) if name else configs.current
+
+        console.print(Panel(
+            Syntax(configs.show(path), 'ini'),
+            title=str(path)
+        ))
+
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING))
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
+
+
+@app.command(rich_help_panel=HelpPanels.CHANGE)
 def new(name: str, open: bool = False):
     """Creates a new config file"""
     try:
@@ -61,14 +85,16 @@ def new(name: str, open: bool = False):
         ))
 
         if open:
-            launch(str(path), locate=True)
+            exit_code = launch(str(path))
+            if exit_code >= 0:
+                launch(str(path), locate=True)
 
     except EnvironmentError as exc:
         console.print(Padding(str(exc), PADDING))
         raise Exit(ExitCodes.FILE_EXISTS)
 
 
-@app.command()
+@app.command(rich_help_panel=HelpPanels.CHANGE)
 def set(name: str):
     """Select a configuration"""
     try:
@@ -84,22 +110,7 @@ def set(name: str):
         raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
 
 
-@app.command()
-def show(name: str):
-    """Shows a config file content"""
-    try:
-        path = configs.get_path(name)
-        console.print(Panel(
-            Syntax(configs.show(path), 'ini'),
-            title=str(path)
-        ))
-
-    except EnvironmentError as exc:
-        console.print(Padding(str(exc), PADDING))
-        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
-
-
-@app.command()
+@app.command(rich_help_panel=HelpPanels.CHANGE)
 def local():
     """Select a config file in current workdir"""
     try:
