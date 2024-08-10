@@ -1,96 +1,141 @@
-import argparse
-
-from typing import NoReturn
-
-from pipconf import __version__
-from pipconf import __module__
-from pipconf import __license__
-from pipconf import __author_github__
-from pipconf import __index__
-
-from pipconf import kernel 
-from pipconf import environment
+from typing import Annotated, Optional
+from typer import Argument, Typer, Exit, launch
+from rich.console import Console
+from rich.syntax import Syntax
+from rich.panel import Panel
+from rich.padding import Padding
+from pipconf.configs import PipConfigs
+from pipconf.consts import PADDING, PADDING_LIST, ExitCodes, Chars, HelpPanels
+from pipconf import __help__
 
 
-NAME = __module__
-VERSION = __version__
-LICENSE = __license__
-AUTHOR = __author_github__
-INDEX = __index__
-DESCRIPTION = """
-\033[93m______ ___________  _____ _____ _   _ ______ \033[0m
-\033[93m| ___ \_   _| ___ \/  __ \  _  | \ | ||  ___|\033[0m
-\033[93m| |_/ / | | | |_/ /| /  \/ | | |  \| || |_ \033[0m
-\033[93m|  __/  | | |  __/ | |   | | | | . ` ||  _|\033[0m
-\033[93m| |    _| |_| |    | \__/\ \_/ / |\  || |\033[0m
-\033[93m\_|    \___/\_|     \____/\___/\_| \_/\_|\033[0m  v{}
-
-Under {} License, by {}
-Contribute at {}
-""".format(VERSION, LICENSE, AUTHOR, INDEX)
+app = Typer(rich_markup_mode='rich', help=__help__)
+console = Console()
+configs = PipConfigs()
 
 
-def init_argparse() -> argparse.ArgumentParser:
-    """
-    Function that initializes the `ArgumentParser` and returns it.
-    """
-    parser = argparse.ArgumentParser(
-        prog=NAME,
-        description=DESCRIPTION,
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
+def list():
+    """Lists all available configs"""
+    try:
+        current = configs.current
+    except EnvironmentError:
+        current = None
 
-    parser.add_argument("-v", "--version", action="store_true", help="show the version of the module")
+    try:
+        lines = []
+        for path in configs.available_configs:
+            if path != current:
+                lines.append(
+                    f'{Chars.EMPTY_CIRCLE.decode()} {path.name} ([grey42]{str(path)}[/])'
+                )
+            else:
+                lines.append(
+                    f'[green]{Chars.FILLED_CIRCLE.decode()} {path.name}[/] ([grey42]{str(path)}[/])'
+                )
 
-    display = parser.add_argument_group("display informations")
-    display.add_argument("--current", action="store_true", help="show the current pip configuration file")
-    display.add_argument("--list", action="store_true", help="list all user configurations avaliable at $HOME/.pip")
-    
-    change = parser.add_argument_group("change configuration")
-    change.add_argument("--set", type=str, dest="filename", help="set the global configuration for pip from a file in $HOME/.pip")
-    change.add_argument("--local", action="store_true", help="set the pip configuration for the current directory file")
+        console.print(
+            Padding(
+                f'Available configurations at [yellow]{configs.directory}[/]:',
+                PADDING,
+            )
+        )
+        console.print(
+            Padding(
+                '\n'.join(lines),
+                PADDING_LIST,
+            )
+        )
 
-    return parser
-
-
-def handle_arguments(args) -> NoReturn:
-    """
-    Function that verify all cli arguments and handle it.
-    """
-
-    # Module version
-    if args.version:
-        # --version
-        print(f"{NAME} {VERSION}")
-
-    # Display arguments
-    if args.current:
-        # --current
-        kernel.print_current_configuration()
-
-    if args.list:
-        # --list
-        kernel.print_user_configurations()
-
-    # Change arguments
-    if args.filename:
-        # --set [filename]
-        kernel.set_user_configuration(args.filename)
-
-    if args.local:
-        # --local
-        kernel.set_local_configuration()
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING), style='red')
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
 
 
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
+def current():
+    """Shows the currently active config file"""
+    try:
+        console.print(
+            Padding(
+                f'Current configuration is [yellow]{str(configs.current)}[/]!',
+                PADDING,
+            )
+        )
 
-def main() -> NoReturn:
-    environment.initialize_environment()
-    
-    parser = init_argparse()
-    args = parser.parse_args()
-
-    handle_arguments(args)
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING), style='red')
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
 
 
-if __name__ == "__main__":
-    main()
+@app.command(rich_help_panel=HelpPanels.DISPLAY)
+def show(
+    name: Annotated[Optional[str], Argument()] = None, local: bool = False
+):
+    """Shows a config file content"""
+    try:
+        if local:
+            path = configs.local
+        else:
+            path = configs.get_path(name) if name else configs.current
+
+        console.print(Panel(Syntax(configs.show(path), 'ini'), title=str(path)))
+
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING))
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
+
+
+@app.command(rich_help_panel=HelpPanels.CHANGE)
+def new(name: str, open: bool = False):
+    """Creates a new config file"""
+    try:
+        path = configs.get_path(name)
+        configs.create(path)
+        console.print(
+            Padding(f'Config file [green]{path.name}[/] created!', PADDING)
+        )
+
+        if open:
+            exit_code = launch(str(path))
+            if exit_code >= 0:
+                launch(str(path), locate=True)
+
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING))
+        raise Exit(ExitCodes.FILE_EXISTS)
+
+
+@app.command(rich_help_panel=HelpPanels.CHANGE)
+def set(name: str):
+    """Select a configuration"""
+    try:
+        path = configs.get_path(name)
+        configs.select(path)
+        console.print(
+            Padding(
+                f'Configuration is now set to [yellow]{path.name}[/]!', PADDING
+            )
+        )
+
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING))
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
+
+
+@app.command(rich_help_panel=HelpPanels.CHANGE)
+def local():
+    """Select a config file in current workdir"""
+    try:
+        local_config = configs.local
+        configs.select(local_config)
+        console.print(
+            Padding(
+                f'Configuration is now set to [yellow]{str(local_config)}[/]!',
+                PADDING,
+            )
+        )
+
+    except EnvironmentError as exc:
+        console.print(Padding(str(exc), PADDING))
+        raise Exit(ExitCodes.NO_SUCH_FILE_OR_DIRECTORY)
