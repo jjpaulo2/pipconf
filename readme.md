@@ -1,5 +1,11 @@
 # PIPCONF - The PIP configuration manager
 
+![Python](https://img.shields.io/badge/Python-3.8_%7C_3.9_%7C_3.10_%7C_3.11_%7C_3.12-green)
+[![Tests](https://github.com/jjpaulo2/pipconf/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/jjpaulo2/pipconf/actions/workflows/tests.yaml)
+[![Publish](https://github.com/jjpaulo2/pipconf/actions/workflows/publish.yaml/badge.svg)](https://github.com/jjpaulo2/pipconf/actions/workflows/publish.yaml)
+[![PyPI - Version](https://img.shields.io/pypi/v/pipconf)](https://pypi.org/project/pipconf/)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Pipconf-deeppink)](https://github.com/sponsors/jjpaulo2)
+
 ![](screenshot.png)
 
 If you need to manage multiple configurations containing indexes and trusted hosts for PIP, this project was made for you.
