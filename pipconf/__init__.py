@@ -1,5 +1,5 @@
 # Module informations
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 __index__ = 'https://github.com/jjpaulo2/pipconf'
 __license__ = 'BSD-2-Clause'
 __author__ = '@jjpaulo2'
