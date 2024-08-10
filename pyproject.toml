@@ -48,9 +48,9 @@ quote-style = "single"
 docstring-code-format = true
 
 [tool.taskipy.tasks]
-tests = { cmd = "pytest", help = "Runs all unit tests" }
+tests = { cmd = "pytest -vvv", help = "Runs all unit tests" }
 lint = { cmd = "ruff format && ruff check --fix", help = "Format and lint the code" }
-security = { cmd = "bandit -c pyproject.toml -r fastrpa", help = "Check security issues on the code" }
+security = { cmd = "bandit -c pyproject.toml -r pipconf", help = "Check security issues on the code" }
 check = { cmd = "ruff format --check && ruff check && mypy .", help = "Check code issues" }
 
 [build-system]

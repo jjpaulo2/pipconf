@@ -3,6 +3,11 @@ PADDING = (
     1,
 )
 
+PADDING_LIST = (
+    1,
+    1,
+)
+
 
 class Chars:
     FILLED_CIRCLE = b'\xe2\x97\x8f'

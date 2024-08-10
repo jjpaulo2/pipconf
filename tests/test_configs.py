@@ -1,6 +1,6 @@
 from pipconf.configs import PipConfigs
 from unittest.mock import MagicMock, patch
-from pytest import raises
+from pytest import mark, raises
 from pathlib import Path
 
 
@@ -71,3 +71,95 @@ def test_local():
 def test_available_configs_empty():
     with raises(EnvironmentError):
         PipConfigs().available_configs
+
+
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.iterdir', MagicMock(return_value=[SOME_PATH]))
+@patch('pipconf.configs.Path.is_symlink', MagicMock(return_value=True))
+def test_available_configs_empty_cause_of_symlinks():
+    with raises(EnvironmentError):
+        PipConfigs().available_configs
+
+
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.iterdir', MagicMock(return_value=[SOME_PATH]))
+@patch('pipconf.configs.Path.is_symlink', MagicMock(return_value=False))
+def test_available_configs():
+    configs = PipConfigs()
+    assert configs.available_configs == [SOME_PATH]
+
+
+@mark.parametrize(
+    ('input_name', 'expected_return'),
+    [
+        ('file', Path(HOME_DIRECTORY, '.pip/file.conf')),
+        ('file.conf', Path(HOME_DIRECTORY, '.pip/file.conf')),
+    ],
+)
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+def test_get_path(input_name: str, expected_return: Path):
+    configs = PipConfigs()
+    assert configs.get_path(input_name) == expected_return
+
+
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=False))
+def test_select_path_does_not_exists():
+    with raises(EnvironmentError):
+        PipConfigs().select(SOME_PATH)
+
+
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.is_symlink', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.unlink')
+@patch('pipconf.configs.Path.symlink_to')
+def test_select(symlink_to_mock: MagicMock, unlink_mock: MagicMock):
+    PipConfigs().select(SOME_PATH)
+    assert symlink_to_mock.call_count == 1
+    assert unlink_mock.call_count == 1
+
+
+@patch('pipconf.configs.Path.home', HOME_MOCK)
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.is_symlink', MagicMock(return_value=False))
+@patch('pipconf.configs.Path.unlink')
+@patch('pipconf.configs.Path.symlink_to')
+@patch('pipconf.configs.copyfile')
+def test_select_backup_original_conf(
+    copyfile_mock: MagicMock, symlink_to_mock: MagicMock, unlink_mock: MagicMock
+):
+    PipConfigs().select(SOME_PATH)
+    assert copyfile_mock.call_count == 1
+    assert symlink_to_mock.call_count == 1
+    assert unlink_mock.call_count == 1
+
+
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+def test_create_path_does_not_exists():
+    with raises(EnvironmentError):
+        PipConfigs().create(SOME_PATH)
+
+
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=False))
+@patch('pipconf.configs.copyfile')
+def test_create(copyfile_mock: MagicMock):
+    PipConfigs().create(SOME_PATH)
+    assert copyfile_mock.call_count == 1
+
+
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=False))
+def test_show_path_does_not_exists():
+    with raises(EnvironmentError):
+        PipConfigs().show(SOME_PATH)
+
+
+@patch('pipconf.configs.Path.exists', MagicMock(return_value=True))
+@patch('pipconf.configs.Path.read_text')
+def test_show(read_text_mock: MagicMock):
+    read_text_mock.return_value = 'some content'
+    config = PipConfigs()
+    assert config.show(SOME_PATH) == 'some content'

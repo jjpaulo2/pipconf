@@ -5,7 +5,7 @@ from rich.syntax import Syntax
 from rich.panel import Panel
 from rich.padding import Padding
 from pipconf.configs import PipConfigs
-from pipconf.consts import PADDING, ExitCodes, Chars, HelpPanels
+from pipconf.consts import PADDING, PADDING_LIST, ExitCodes, Chars, HelpPanels
 from pipconf import __help__
 
 
@@ -38,12 +38,7 @@ def list():
         console.print(
             Padding(
                 '\n'.join(lines),
-                (
-                    0,
-                    0,
-                    1,
-                    1,
-                ),
+                PADDING_LIST,
             )
         )
 
@@ -69,7 +64,9 @@ def current():
 
 
 @app.command(rich_help_panel=HelpPanels.DISPLAY)
-def show(name: Annotated[Optional[str], Argument()] = None, local: bool = False):
+def show(
+    name: Annotated[Optional[str], Argument()] = None, local: bool = False
+):
     """Shows a config file content"""
     try:
         if local:

@@ -76,5 +76,4 @@ class PipConfigs:
     def show(self, path: Path) -> str:
         if not path.exists():
             raise EnvironmentError(f'The file {path} does not exist!')
-        with open(path, 'r') as file:
-            return file.read()
+        return path.read_text()
