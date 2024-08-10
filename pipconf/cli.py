@@ -1,4 +1,3 @@
-from contextlib import suppress
 from typing import Annotated, Optional
 from typer import Argument, Typer, Exit, launch
 from rich.console import Console

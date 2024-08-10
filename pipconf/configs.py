@@ -44,9 +44,7 @@ class PipConfigs:
     @property
     def available_configs(self) -> List[Path]:
         gotten_files = [
-            path
-            for path in self.directory.iterdir()
-            if not path.is_symlink()
+            path for path in self.directory.iterdir() if not path.is_symlink()
         ]
         if not gotten_files:
             raise EnvironmentError('No one configuration found!')
@@ -60,10 +58,9 @@ class PipConfigs:
     def select(self, path: Path):
         if not path.exists():
             raise EnvironmentError(f'The file {path} does not exist!')
-        if all([
-            self.default_file.exists(),
-            not self.default_file.is_symlink()
-        ]):
+        if all(
+            [self.default_file.exists(), not self.default_file.is_symlink()]
+        ):
             backup_path = self.default_file.parent.joinpath(
                 f'pip.backup.{self._extension}'
             )
