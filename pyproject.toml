@@ -38,7 +38,7 @@ pytest-mock = "^3.14.0"
 taskipy = "^1.13.0"
 
 [tool.poetry.scripts]
-pipconf = "pipconf.cli:main"
+pipconf = "pipconf.__main__:app"
 
 [tool.ruff]
 line-length = 80

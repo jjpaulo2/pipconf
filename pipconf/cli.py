@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Annotated, Optional
 from typer import Argument, Typer, Exit, launch
 from rich.console import Console
@@ -18,9 +19,14 @@ configs = PipConfigs()
 def list():
     """Lists all available configs"""
     try:
+        current = configs.current
+    except EnvironmentError:
+        current = None
+
+    try:
         lines = []
         for path in configs.available_configs:
-            if path != configs.current:
+            if path != current:
                 lines.append(
                     f'{Chars.EMPTY_CIRCLE.decode()} {path.name} ([grey42]{str(path)}[/])'
                 )

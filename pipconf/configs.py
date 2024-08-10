@@ -9,7 +9,7 @@ class PipConfigs:
         self._default_file: Optional[Path] = None
         self._extension = 'conf'
         self._config_file = 'pip.conf'
-        self._template = Path(__file__).parent.parent.joinpath(
+        self._template = Path(__file__).parent.joinpath(
             f'templates/{self._config_file}'
         )
 
@@ -46,7 +46,7 @@ class PipConfigs:
         gotten_files = [
             path
             for path in self.directory.iterdir()
-            if all([not path.is_symlink(), path != self.default_file])
+            if not path.is_symlink()
         ]
         if not gotten_files:
             raise EnvironmentError('No one configuration found!')
@@ -60,12 +60,15 @@ class PipConfigs:
     def select(self, path: Path):
         if not path.exists():
             raise EnvironmentError(f'The file {path} does not exist!')
-        if not self.default_file.is_symlink():
+        if all([
+            self.default_file.exists(),
+            not self.default_file.is_symlink()
+        ]):
             backup_path = self.default_file.parent.joinpath(
                 f'pip.backup.{self._extension}'
             )
             copyfile(self.default_file, backup_path)
-        self.default_file.unlink()
+        self.default_file.unlink(missing_ok=True)
         self.default_file.symlink_to(path)
 
     def create(self, path: Path):
